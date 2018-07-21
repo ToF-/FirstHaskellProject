@@ -1,4 +1,4 @@
-module WordLadder (adjacent, wordGraph, toList ) where
+module WordLadder (adjacent, wordGraph, ladder, toList ) where
 
 type WordGraph = [(String,[String])]
 
@@ -12,3 +12,13 @@ wordGraph :: [String] -> WordGraph
 wordGraph ws = map (\w -> (w,filter (w `adjacent`) ws)) ws
 
 toList = id
+
+ladder :: [String] -> String -> String -> [String]
+ladder _ s t | length s /= length t = []
+ladder ws s t = ladder' (wordGraph ws) s t
+
+ladder' :: WordGraph -> String -> String -> [String]
+ladder' g s t = case fmap (t `elem`) (s `lookup` g) of
+    Nothing   -> []
+    Just True -> [s,t]
+    Just False -> []
