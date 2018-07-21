@@ -1,7 +1,6 @@
 import System.Environment
 import WordLadder
 
-import Lib
 
 main :: IO ()
 main = do
