@@ -7,30 +7,35 @@ type Words = [String]
 type Edge = (String, String)
 type Path = [Edge]
 
+-- two words are adjacent if they differ only by one letter
 adjacent :: String -> String -> Bool
 adjacent s t | length s /= length t = False
 adjacent s t | s == t = False
 adjacent (c:cs) (d:ds) | c /= d     = cs == ds
                        | otherwise = adjacent cs ds
 
+-- create a graph of adjacent words
 wordGraph :: [String] -> Graph
 wordGraph ws = map (\w -> (w,filter (w `adjacent`) ws)) ws
 
 toList = id
 
+-- find the ladder between two words
 ladder :: Words -> Start -> Target -> Words
-ladder _ s t | s == t = []
-ladder _ s t | length s /= length t = []
-ladder ws s t = path (ladder' (wordGraph ws) t [(s,s)] []) t
+ladder _ start target | start == target = []
+ladder _ start target | length start /= length target = []
+ladder words start target = walk target (ladder' (wordGraph words) target [(start,start)] [])
 
-path :: Path -> Target -> Words
-path ps t = reverse $ path' ps t
+-- climb down the path from a target word to the starting word (where word == parent)
+walk :: Target -> Path -> Words
+walk target path = reverse (walk' target path)
     where
-    path' p t = case t `lookup` p of
+    walk' :: Target -> Path -> Words
+    walk' target path = case target `lookup` path of
       Nothing -> []
-      Just u  -> case u == t of
-        True -> [t]
-        False -> t : path' p u
+      Just parent  -> case parent == target of
+        True -> [target]
+        False -> target : walk' parent path
 
 ladder' :: Graph -> Target -> [Edge] -> [Edge] -> Path
 ladder' g t [] vs = []
