@@ -1,10 +1,16 @@
 import Test.Hspec
+import WordLadder
 
 main :: IO ()
 main = hspec $ do
-    describe "some feature" $ do
-        it "should work" $ do
-            2 + 2 `shouldBe` 4
-    describe "some other feature" $ do
-      it "should also work" $ do
-       2+3 `shouldBe` 4
+    describe "adjacent words" $ do
+        it "cannot be identical" $ do
+            ("DOG" `adjacent` "DOG") `shouldBe` False
+
+        it "cannot be of different size" $ do
+          ("DOG" `adjacent` "DOGE") `shouldBe` False
+
+        it "differ by one letter only" $ do
+          ("DOG" `adjacent` "COG") `shouldBe` True
+          ("DOG" `adjacent` "CAT") `shouldBe` False
+
