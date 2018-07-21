@@ -1,6 +1,6 @@
 module Main where
 
-import WordLadder
+import Lib
 
 main :: IO ()
 main = someFunc
