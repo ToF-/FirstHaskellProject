@@ -31,7 +31,6 @@ ladder words start target = walk target (ladder' (wordGraph words) target [(star
 
   ladder' graph target (edge@(word,_):edges) visited = case lookup word graph of
       Nothing   -> []
-      Just []   -> ladder' graph target edges (edge:visited)
       Just neighbors -> ladder' graph target (edges ++ [ (neighbor,word)
                                                      | neighbor <- neighbors
                                                      , lookup neighbor visited == Nothing])
