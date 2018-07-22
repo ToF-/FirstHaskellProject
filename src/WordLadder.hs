@@ -33,7 +33,8 @@ ladder words start target = walk target (ladder' (wordGraph words) target [(star
       Nothing   -> []
       Just neighbors -> ladder' graph target (edges ++ [ (neighbor,word)
                                                      | neighbor <- neighbors
-                                                     , lookup neighbor visited == Nothing])
+                                                     , lookup neighbor visited == Nothing
+                                                     && lookup neighbor edges == Nothing])
                                             (edge:visited)
 
 -- climb the path from a target word to the starting word (where word == parent)
