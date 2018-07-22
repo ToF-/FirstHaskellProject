@@ -1,9 +1,6 @@
 module WordLadder (adjacent, wordGraph, ladder, toList ) where
 
 type Graph = [(String,[String])]
-type Start  = String
-type Target = String
-type Words = [String]
 type Edge = (String, String)
 type Path = [Edge]
 
@@ -21,26 +18,33 @@ wordGraph ws = map (\w -> (w,filter (w `adjacent`) ws)) ws
 toList = id
 
 -- find the ladder between two words
-ladder :: Words -> Start -> Target -> Words
+ladder :: [String] -> String -> String -> [String]
 ladder _ start target | start == target = []
 ladder _ start target | length start /= length target = []
-ladder words start target = walk target (ladder' (wordGraph words) target [(start,start)] [])
+ladder words start target = walk target (ladder' (wordGraph words) target [(start,start)] [] )
+  where
+  ladder' :: Graph -> String -> [Edge] -> [Edge] -> Path
+  ladder' _ _ [] _ = []
 
--- climb down the path from a target word to the starting word (where word == parent)
-walk :: Target -> Path -> Words
+  ladder' _ target (edge@(word,parent):_) visited
+    | word == target = edge:visited
+
+  ladder' graph target (edge@(word,_):edges) visited = case lookup word graph of
+      Nothing   -> []
+      Just []   -> ladder' graph target edges (edge:visited)
+      Just neighbors -> ladder' graph target (edges ++ [ (neighbor,word)
+                                                     | neighbor <- neighbors
+                                                     , lookup neighbor visited == Nothing])
+                                            (edge:visited)
+
+-- climb the path from a target word to the starting word (where word == parent)
+walk :: String -> Path -> [String]
 walk target path = reverse (walk' target path)
     where
-    walk' :: Target -> Path -> Words
-    walk' target path = case target `lookup` path of
+    walk' :: String -> Path -> [String]
+    walk' target path = case lookup target path of
       Nothing -> []
       Just parent  -> case parent == target of
         True -> [target]
         False -> target : walk' parent path
 
-ladder' :: Graph -> Target -> [Edge] -> [Edge] -> Path
-ladder' g t [] vs = []
-ladder' g t ((s,n):_) vs | t == s = ((s,n):vs)
-ladder' g t ((s,r):ss) vs = case s `lookup` g of
-    Nothing   -> []
-    Just []   -> ladder' g t ss ((s,r):vs)
-    Just ns -> ladder' g t (ss ++ [(x,s) | x <- ns , x `lookup` vs == Nothing]) ((s,r):vs)
